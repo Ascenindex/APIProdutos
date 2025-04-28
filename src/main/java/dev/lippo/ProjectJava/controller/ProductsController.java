@@ -8,54 +8,35 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
-
 public class ProductsController {
 
     @Autowired
     private ProductsService productsService;
 
-    @GetMapping("/showALlProducts")
-    public List<ProductsModel> showProducts(){
+    // Método para mostrar todos os produtos
+    @GetMapping("/showAllProducts")
+    public List<ProductsModel> showProducts() {
         return productsService.getAllProducts();
     }
 
+    // Método para criar um novo produto
     @PostMapping("/createProduct")
     public String postRoute(@RequestBody ProductsModel product) {
-        productsService.addProduct(product);
-        return "Product added successfully!";
+        return productsService.addProduct(product);
     }
 
+    // Método para deletar um produto
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable int id){
-        boolean removed = productsService.getAllProducts().removeIf(productsModel -> productsModel.getId() == id);
-        if (!removed){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("User not found with ID "+ id);
-        }
-        return ResponseEntity.ok("User with ID " + id+ " deleted successfully!");
+    public ResponseEntity<String> deleteProduct(@PathVariable int id) {
+        return productsService.deleteProduct(id);
     }
 
-
+    // Método para editar um produto
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> updateProduct(@PathVariable Long id, @RequestBody ProductsModel updatedProduct) {
-        Optional<ProductsModel> existingProduct = productsService.getAllProducts().stream()
-                .filter(product -> product.getId().equals(id))
-                .findFirst();
-
-        if (!existingProduct.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Product not found with ID " + id);
-        }
-
-        ProductsModel product = existingProduct.get();
-        product.setName(updatedProduct.getName());
-        product.setPrice(updatedProduct.getPrice());
-
-        return ResponseEntity.ok("Product with ID " + id + " updated successfully!");
+        return productsService.updateProduct(id, updatedProduct);
     }
-
 }
